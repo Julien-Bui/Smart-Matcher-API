@@ -15,6 +15,10 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
+/*
+
+*/
+
 * {
     margin: 0;
     padding: 0;
@@ -224,7 +228,9 @@ textarea::placeholder {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .hidden {
@@ -243,8 +249,15 @@ textarea::placeholder {
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .results-header {
@@ -368,7 +381,9 @@ textarea::placeholder {
 }
 
 @media (max-width: 768px) {
-    .workspace, .analysis-details {
+
+    .workspace,
+    .analysis-details {
         grid-template-columns: 1fr;
     }
 }
