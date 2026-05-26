@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Matcher | Recrutement IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="main-container">
+        <header>
+            <h1>Smart Matcher</h1>
+            <p>Analyse de compatibilité propulsée par l'IA</p>
+        </header>
+
+        <section class="workspace">
+            <!-- Left Side: CV Upload -->
+            <div class="card cv-section">
+                <h2>1. Profil du candidat</h2>
+                <div class="upload-area" id="drop-zone">
+                    <div class="upload-icon">📄</div>
+                    <p>Ajouter votre CV (PDF)</p>
+                    <span class="or-text">ou</span>
+                    <label for="cv-upload" class="btn btn-secondary">Parcourir les fichiers</label>
+                    <input type="file" id="cv-upload" accept=".pdf" hidden>
+                    <p id="file-name" class="file-name"></p>
+                </div>
+            </div>
+
+            <!-- Right Side: Job Offer -->
+            <div class="card job-section">
+                <h2>2. Descriptif du poste</h2>
+                <div class="input-area">
+                    <textarea id="job-description" placeholder="Coller le descriptif du poste ici..."
+                        rows="8"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <div class="action-section">
+            <button id="analyze-btn" class="btn btn-primary" disabled>
+                <span class="btn-text">Analyser</span>
+                <span class="loader hidden"></span>
+            </button>
+        </div>
+
+        <!-- Results Overlay -->
+        <div id="results-container" class="results-container hidden">
+            <div class="results-header">
+                <h2>Résultats de l'analyse</h2>
+                <div class="score-ring">
+                    <svg viewBox="0 0 36 36" class="circular-chart">
+                        <path class="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" id="score-circle" stroke-dasharray="0, 100"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.35" class="percentage" id="score-text">0%</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="analysis-details">
+                <div class="analysis-card strengths">
+                    <h3>Points positifs</h3>
+                    <ul id="pros-list"></ul>
+                </div>
+                <div class="analysis-card weaknesses">
+                    <h3>Points faibles</h3>
+                    <ul id="cons-list"></ul>
+                </div>
+            </div>
+            <p class="summary-text" id="summary-text"></p>
+            <button id="reset-btn" class="btn btn-secondary">Nouvelle analyse</button>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>
