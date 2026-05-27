@@ -6,6 +6,9 @@
 server.port=8081
 server.address=0.0.0.0
 
+# --- CORS ---
+cors.allowed-origins=${ALLOWED_ORIGINS:http://localhost:5173,https://julienbui.dev}
+
 # --- Base de données ---
 spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:h2:mem:smartmatcher}
 spring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}
