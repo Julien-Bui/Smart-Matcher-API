@@ -60,8 +60,10 @@ public class MatchingEngine {
             JsonNode json = objectMapper.readTree(cleanJson);
             String candidateName = json.has("candidateName") ? json.get("candidateName").asText() : "Inconnu";
             int score = json.has("score") ? json.get("score").asInt() : 0;
-            String matchedSkills = json.has("matchedSkills") ? json.get("matchedSkills").asText() : "";
-            String missingSkills = json.has("missingSkills") ? json.get("missingSkills").asText() : "";
+
+            String matchedSkills = extractStringOrArray(json, "matchedSkills");
+            String missingSkills = extractStringOrArray(json, "missingSkills");
+
             String summary = json.has("summary") ? json.get("summary").asText() : "";
             return new MatchResult(candidateName, score, matchedSkills, missingSkills, summary, offerDescription);
         } catch (Exception e) {
@@ -69,6 +71,20 @@ public class MatchingEngine {
             System.err.println("Réponse brute reçue :\n" + aiResponse);
             return new MatchResult("Inconnu", 0, "", "", aiResponse, offerDescription);
         }
+    }
+
+    private String extractStringOrArray(JsonNode json, String field) {
+        if (!json.has(field))
+            return "";
+        JsonNode node = json.get(field);
+        if (node.isArray()) {
+            StringBuilder sb = new StringBuilder();
+            for (JsonNode item : node) {
+                sb.append("- ").append(item.asText()).append("\n");
+            }
+            return sb.toString().trim();
+        }
+        return node.asText();
     }
 
     /**
