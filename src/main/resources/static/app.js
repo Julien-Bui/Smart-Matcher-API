@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const jobDescription = document.getElementById('job-description');
     const analyzeBtn = document.getElementById('analyze-btn');
     
-    // Results elements
     const resultsContainer = document.getElementById('results-container');
     const scoreCircle = document.getElementById('score-circle');
     const scoreText = document.getElementById('score-text');
@@ -18,9 +17,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = analyzeBtn.querySelector('.loader');
 
     let selectedFile = null;
+    const USAGE_LIMIT = 3;
+    const TIME_LIMIT_MS = 15 * 60 * 1000;
+    
+    let currentUsage = parseInt(localStorage.getItem('smart_matcher_usage')) || 0;
+    let usageTimestamp = parseInt(localStorage.getItem('smart_matcher_usage_timestamp')) || 0;
 
-    // Check Button State
+    const usageLimitMsg = document.getElementById('usage-limit-msg');
+
     function checkInputs() {
+        if (usageTimestamp > 0 && Date.now() - usageTimestamp > TIME_LIMIT_MS) {
+            currentUsage = 0;
+            localStorage.setItem('smart_matcher_usage', 0);
+        }
+
+        if (currentUsage >= USAGE_LIMIT) {
+            const minutesLeft = Math.ceil((TIME_LIMIT_MS - (Date.now() - usageTimestamp)) / 60000);
+            analyzeBtn.disabled = true;
+            if (usageLimitMsg) {
+                usageLimitMsg.classList.remove('hidden');
+                usageLimitMsg.textContent = `Limite atteinte. Veuillez patienter ${minutesLeft} minute(s).`;
+                usageLimitMsg.style.color = '#ef4444';
+            }
+            return;
+        }
+        
+        if (usageLimitMsg) {
+            usageLimitMsg.classList.remove('hidden');
+            usageLimitMsg.textContent = `Analyses restantes : ${USAGE_LIMIT - currentUsage}/${USAGE_LIMIT} (se renouvelle toutes les 15min)`;
+            usageLimitMsg.style.color = '#6b7280';
+        }
+
         if (selectedFile && jobDescription.value.trim() !== '') {
             analyzeBtn.disabled = false;
         } else {
@@ -28,14 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // File Input Handle
     cvUpload.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 selectedFile = file;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
-                fileNameDisplay.style.color = '#10b981'; // Success color
+                fileNameDisplay.style.color = '#10b981';
             } else {
                 selectedFile = null;
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
@@ -49,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         checkInputs();
     });
 
-    // Drag and Drop
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropZone.classList.add('dragover');
@@ -68,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const file = e.dataTransfer.files[0];
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 selectedFile = file;
-                cvUpload.files = e.dataTransfer.files; // Sync to input
+                cvUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
                 fileNameDisplay.style.color = '#10b981';
             } else {
@@ -82,17 +107,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     jobDescription.addEventListener('input', checkInputs);
 
-    // Call API
     analyzeBtn.addEventListener('click', async () => {
+        checkInputs();
+        if (currentUsage >= USAGE_LIMIT) return;
         if (!selectedFile || jobDescription.value.trim() === '') return;
 
-        // UI Loading state
+        if (currentUsage === 0) {
+            usageTimestamp = Date.now();
+            localStorage.setItem('smart_matcher_usage_timestamp', usageTimestamp);
+        }
+        currentUsage++;
+        localStorage.setItem('smart_matcher_usage', currentUsage);
+        checkInputs();
+
         analyzeBtn.disabled = true;
         btnText.classList.add('hidden');
         loader.classList.remove('hidden');
         resultsContainer.classList.add('hidden');
 
-        // Form Data
         const formData = new FormData();
         formData.append('cv', selectedFile);
         formData.append('description', jobDescription.value.trim());
@@ -114,26 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error during analysis:', error);
             alert(error.message);
         } finally {
-            // Restore button
             btnText.classList.remove('hidden');
             loader.classList.add('hidden');
-            analyzeBtn.disabled = false;
+            checkInputs();
         }
     });
 
     function displayResults(data) {
-        // Calculate stroke color based on score
         const score = data.score;
-        let strokeColor = '#ef4444'; // Red
-        if (score >= 75) strokeColor = '#10b981'; // Green
-        else if (score >= 50) strokeColor = '#f59e0b'; // Yellow
+        let strokeColor = '#ef4444';
+        if (score >= 75) strokeColor = '#10b981';
+        else if (score >= 50) strokeColor = '#f59e0b';
 
-        // Animate score
         scoreCircle.style.stroke = strokeColor;
         scoreCircle.style.strokeDasharray = `${score}, 100`;
         scoreText.textContent = `${score}%`;
 
-        // Populate Lists (Splitting comma or newline strings)
         prosList.innerHTML = '';
         if (data.matchedSkills && data.matchedSkills.trim().length > 0) {
             const skills = data.matchedSkills.split(/[\n,]/).filter(s => s.trim().length > 0);
@@ -158,16 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
             consList.innerHTML = '<li>Aucune compétence manquante spécifique.</li>';
         }
 
-        // Summary
         summaryText.textContent = data.summary || 'Aucune synthèse fournie.';
 
-        // Show results
         resultsContainer.classList.remove('hidden');
-        // Scroll to results
         resultsContainer.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Reset 
     resetBtn.addEventListener('click', () => {
         selectedFile = null;
         cvUpload.value = '';
@@ -177,4 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
         checkInputs();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    checkInputs();
 });
