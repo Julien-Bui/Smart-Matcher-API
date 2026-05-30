@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "match_results")
-public class MatchResult
-{
+public class MatchResult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,13 +26,12 @@ public class MatchResult
     @Lob
     private String offerDescription;
 
-    public MatchResult()
-    {
+    public MatchResult() {
 
     }
 
-    public MatchResult(String candidateName, int score, String matchedSkills, String missingSkills, String summary,String offerDescription)
-    {
+    public MatchResult(String candidateName, int score, String matchedSkills, String missingSkills, String summary,
+            String offerDescription) {
         this.candidateName = candidateName;
         this.score = score;
         this.matchedSkills = matchedSkills;
@@ -42,73 +40,59 @@ public class MatchResult
         this.offerDescription = offerDescription;
     }
 
-    public Long getId()
-    {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Long id)
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getCandidateName()
-    {
+    public String getCandidateName() {
         return this.candidateName;
     }
 
-    public void setCandidateName(String candidateName)
-    {
+    public void setCandidateName(String candidateName) {
         this.candidateName = candidateName;
     }
 
-    public int getScore()
-    {
+    public int getScore() {
         return this.score;
     }
 
-    public void setScore(int score)
-    {
+    public void setScore(int score) {
         this.score = score;
     }
 
-    public String getMatchedSkills()
-    {
+    public String getMatchedSkills() {
         return this.matchedSkills;
     }
 
-    public void setMatchedSkills(String matchedSkills)
-    {
+    public void setMatchedSkills(String matchedSkills) {
         this.matchedSkills = matchedSkills;
     }
 
-    public String getMissingSkills()
-    {
+    public String getMissingSkills() {
         return this.missingSkills;
     }
 
-    public void setMissingSkills(String missingSkills)
-    {
+    public void setMissingSkills(String missingSkills) {
         this.missingSkills = missingSkills;
     }
 
-    public String getSummary()
-    {
+    public String getSummary() {
         return this.summary;
     }
 
-    public void setSummary(String summary)
-    {
+    public void setSummary(String summary) {
         this.summary = summary;
     }
 
-    public String getOfferDescription()
-    {
+    public String getOfferDescription() {
         return this.offerDescription;
     }
 
-    public void setOfferDescription(String offerDescription)
-    {
+    public void setOfferDescription(String offerDescription) {
         this.offerDescription = offerDescription;
     }
 

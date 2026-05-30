@@ -27,6 +27,10 @@ public class MatchingEngine {
         this.mistralAiService = mistralAiService;
         this.matchRepo = matchRepo;
         this.objectMapper = new ObjectMapper();
+        // Autoriser les sauts de ligne non échappés (très fréquent avec les LLM)
+        this.objectMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        // Autoriser les virgules à la fin des tableaux/objets
+        this.objectMapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_TRAILING_COMMA, true);
     }
 
     /**
@@ -46,8 +50,7 @@ public class MatchingEngine {
      */
     public MatchResult parseAiResponse(String aiResponse, String offerDescription) {
         try {
-            // Extraire uniquement le contenu entre la première '{' et la dernière '}'
-            // Cela ignore tout texte bavard que l'IA pourrait ajouter avant ou après
+
             int startIndex = aiResponse.indexOf('{');
             int endIndex = aiResponse.lastIndexOf('}');
 
