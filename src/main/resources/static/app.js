@@ -133,8 +133,14 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('cv', selectedFile);
         formData.append('description', jobDescription.value.trim());
 
+        // Détermine l'URL de l'API selon qu'on est en local ou en production
+        let apiUrl = '/api/match';
+        if (window.location.hostname === 'julienbui.dev' || window.location.hostname === 'www.julienbui.dev') {
+            apiUrl = 'https://smart-matcher-api-production.up.railway.app/api/match';
+        }
+
         try {
-            const response = await fetch('/api/match', {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 body: formData
             });
