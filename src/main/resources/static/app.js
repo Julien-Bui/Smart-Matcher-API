@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileNameDisplay = document.getElementById('file-name');
     const jobDescription = document.getElementById('job-description');
     const analyzeBtn = document.getElementById('analyze-btn');
-    
+
     const resultsContainer = document.getElementById('results-container');
     const scoreCircle = document.getElementById('score-circle');
     const scoreText = document.getElementById('score-text');
@@ -12,23 +12,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const consList = document.getElementById('cons-list');
     const summaryText = document.getElementById('summary-text');
     const resetBtn = document.getElementById('reset-btn');
-    
+
     const btnText = analyzeBtn.querySelector('.btn-text');
     const loader = analyzeBtn.querySelector('.loader');
 
     let selectedFile = null;
     const USAGE_LIMIT = 3;
     const TIME_LIMIT_MS = 15 * 60 * 1000;
-    
+
     let currentUsage = parseInt(localStorage.getItem('smart_matcher_usage')) || 0;
     let usageTimestamp = parseInt(localStorage.getItem('smart_matcher_usage_timestamp')) || 0;
 
     const usageLimitMsg = document.getElementById('usage-limit-msg');
 
     function checkInputs() {
-        if (usageTimestamp > 0 && Date.now() - usageTimestamp > TIME_LIMIT_MS) {
+        // Reset if we passed the time limit OR if state is invalid (usage > 0 but no timestamp)
+        if (currentUsage > 0 && (usageTimestamp === 0 || Date.now() - usageTimestamp > TIME_LIMIT_MS)) {
             currentUsage = 0;
+            usageTimestamp = 0;
             localStorage.setItem('smart_matcher_usage', 0);
+            localStorage.setItem('smart_matcher_usage_timestamp', 0);
         }
 
         if (currentUsage >= USAGE_LIMIT) {
@@ -36,12 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
             analyzeBtn.disabled = true;
             if (usageLimitMsg) {
                 usageLimitMsg.classList.remove('hidden');
-                usageLimitMsg.textContent = `Limite atteinte. Veuillez patienter ${minutesLeft} minute(s).`;
+                // Ensure we don't display negative values just in case
+                usageLimitMsg.textContent = `Limite atteinte. Veuillez patienter ${minutesLeft > 0 ? minutesLeft : 1} minute(s).`;
                 usageLimitMsg.style.color = '#ef4444';
             }
             return;
         }
-        
+
         if (usageLimitMsg) {
             usageLimitMsg.classList.remove('hidden');
             usageLimitMsg.textContent = `Analyses restantes : ${USAGE_LIMIT - currentUsage}/${USAGE_LIMIT} (se renouvelle toutes les 15min)`;
@@ -88,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
-        
+
         if (e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0];
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
