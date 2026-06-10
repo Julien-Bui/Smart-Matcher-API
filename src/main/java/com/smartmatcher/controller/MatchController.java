@@ -5,6 +5,9 @@ import com.smartmatcher.service.MatchingEngine;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
+import com.smartmatcher.service.RateLimitingService;
+import io.github.bucket4j.Bucket;
 
 import java.util.List;
 
@@ -17,9 +20,11 @@ import java.util.List;
 public class MatchController {
 
     private final MatchingEngine matchingEngine;
+    private final RateLimitingService rateLimitingService;
 
-    public MatchController(MatchingEngine matchingEngine) {
+    public MatchController(MatchingEngine matchingEngine, RateLimitingService rateLimitingService) {
         this.matchingEngine = matchingEngine;
+        this.rateLimitingService = rateLimitingService;
     }
 
     /**
@@ -28,8 +33,17 @@ public class MatchController {
     @PostMapping("/match")
     public ResponseEntity<?> match(
             @RequestParam("cv") MultipartFile cv,
-            @RequestParam("description") String description) {
+            @RequestParam("description") String description,
+            HttpServletRequest request) {
         try {
+            // Rate Limiting check
+            String clientIp = getClientIP(request);
+            Bucket bucket = rateLimitingService.resolveBucket(clientIp);
+
+            if (!bucket.tryConsume(1)) {
+                return ResponseEntity.status(429)
+                        .body("Erreur : Limite de 3 requêtes par 15 minutes atteinte. Veuillez patienter.");
+            }
             // Vérifier si le fichier est vide
             if (cv.isEmpty()) {
                 return ResponseEntity.badRequest().body("Erreur : Le fichier CV est vide.");
@@ -66,5 +80,13 @@ public class MatchController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
         }
+    }
+
+    private String getClientIP(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
     }
 }
