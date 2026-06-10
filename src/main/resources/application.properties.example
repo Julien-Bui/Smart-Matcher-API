@@ -9,14 +9,9 @@ server.address=0.0.0.0
 # --- CORS ---
 cors.allowed-origins=${ALLOWED_ORIGINS:http://localhost:5173,https://julienbui.dev}
 
-# --- Base de données ---
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:h2:mem:smartmatcher}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}
-
-# H2 Console (uniquement en mode dev sans Docker)
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
+# --- Profils ---
+# Active le profil de développement par défaut en local
+spring.profiles.active=dev
 
 # --- JPA / Hibernate ---
 spring.jpa.hibernate.ddl-auto=update

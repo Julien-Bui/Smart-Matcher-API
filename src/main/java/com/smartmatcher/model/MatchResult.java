@@ -1,6 +1,8 @@
 package com.smartmatcher.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "match_results")
@@ -25,6 +27,10 @@ public class MatchResult {
 
     @Lob
     private String offerDescription;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
     public MatchResult() {
 
@@ -94,6 +100,14 @@ public class MatchResult {
 
     public void setOfferDescription(String offerDescription) {
         this.offerDescription = offerDescription;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
 }

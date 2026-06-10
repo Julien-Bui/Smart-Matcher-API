@@ -13,4 +13,6 @@ public interface MatchRepo extends JpaRepository<MatchResult, Long>
     List<MatchResult> findByCandidateName(String candidateName);
 
     List<MatchResult> findByScoreGreaterThanEqual(int minScore);
+
+    void deleteByCreatedAtBefore(java.time.LocalDateTime expiryDate);
 }

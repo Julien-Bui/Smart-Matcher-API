@@ -4,7 +4,8 @@
 
 ## 🚀 Comment lancer le projet
 
-Le projet a été simplifié pour fonctionner de manière complètement autonome (sans Docker ni configuration externe requise) grâce à une base de données en mémoire automatique (H2).
+Le projet est propulsé par une base de données PostgreSQL en production et utilise automatiquement H2 (base en mémoire) pour le développement local.
+Les données sont automatiquement supprimées après 24h pour des raisons de conformité RGPD.
 
 ### Prérequis
 - Java 17 ou supérieur

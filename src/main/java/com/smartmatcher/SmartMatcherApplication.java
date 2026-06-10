@@ -2,13 +2,13 @@ package com.smartmatcher;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class SmartMatcherApplication
-{
+@EnableScheduling
+public class SmartMatcherApplication {
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         SpringApplication.run(SmartMatcherApplication.class, args);
     }
 }
