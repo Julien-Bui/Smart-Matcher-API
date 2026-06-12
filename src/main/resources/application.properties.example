@@ -5,6 +5,7 @@
 # --- Serveur ---
 server.port=8081
 server.address=0.0.0.0
+server.forward-headers-strategy=framework
 
 # --- CORS ---
 cors.allowed-origins=${ALLOWED_ORIGINS:http://localhost:5173,https://julienbui.dev}

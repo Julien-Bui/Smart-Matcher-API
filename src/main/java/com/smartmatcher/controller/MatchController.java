@@ -49,17 +49,20 @@ public class MatchController {
                 return ResponseEntity.badRequest().body("Erreur : Le fichier CV est vide.");
             }
 
-            // Vérifier le type MIME du fichier (doit être un PDF)
-            String contentType = cv.getContentType();
-            if (contentType == null || !contentType.equals("application/pdf")) {
-                return ResponseEntity.badRequest()
-                        .body("Erreur : Le fichier doit être au format PDF. Type reçu : " + contentType);
+            // Vérification pour s'assurer que c'est un vrai PDF
+            try (java.io.InputStream is = cv.getInputStream()) {
+                byte[] magic = new byte[4];
+                if (is.read(magic) < 4 || magic[0] != 0x25 || magic[1] != 0x50 || magic[2] != 0x44
+                        || magic[3] != 0x46) {
+                    return ResponseEntity.badRequest()
+                            .body("Erreur : Le fichier n'est pas un document PDF valide (signature incorrecte).");
+                }
             }
 
-            // Vérifier l'extension du fichier par précaution
-            String originalFilename = cv.getOriginalFilename();
-            if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".pdf")) {
-                return ResponseEntity.badRequest().body("Erreur : L'extension du fichier doit être .pdf");
+            // Limiter la taille de la description pour éviter l'épuisement des tokens
+            if (description == null || description.trim().isEmpty() || description.length() > 5000) {
+                return ResponseEntity.badRequest().body(
+                        "Erreur : La description de l'offre doit être non vide et ne doit pas dépasser 5000 caractères.");
             }
 
             MatchResult result = matchingEngine.processMatching(cv, description);
@@ -69,24 +72,7 @@ public class MatchController {
         }
     }
 
-    /**
-     * GET /api/results — Récupère tous les résultats passés.
-     */
-    @GetMapping("/results")
-    public ResponseEntity<?> getAllResults() {
-        try {
-            List<MatchResult> results = matchingEngine.getAllResults();
-            return ResponseEntity.ok(results);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
-        }
-    }
-
     private String getClientIP(HttpServletRequest request) {
-        String xfHeader = request.getHeader("X-Forwarded-For");
-        if (xfHeader == null) {
-            return request.getRemoteAddr();
-        }
-        return xfHeader.split(",")[0];
+        return request.getRemoteAddr();
     }
 }
