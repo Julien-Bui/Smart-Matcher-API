@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Limite remise en place pour la production
     const USAGE_LIMIT = 3;
-    const TIME_LIMIT_MS = 15 * 60 * 1000;
+    const TIME_LIMIT_MS = 5 * 60 * 1000;
 
     let currentUsage = parseInt(localStorage.getItem('smart_matcher_usage')) || 0;
     let usageTimestamp = parseInt(localStorage.getItem('smart_matcher_usage_timestamp')) || 0;

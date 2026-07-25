@@ -19,8 +19,8 @@ public class RateLimitingService {
     }
 
     private Bucket newBucket(String apiKey) {
-        // 3 requêtes toutes les 15 minutes
-        Refill refill = Refill.intervally(3, Duration.ofMinutes(15));
+        // 3 requêtes toutes les 5 minutes
+        Refill refill = Refill.intervally(3, Duration.ofMinutes(5));
         Bandwidth limit = Bandwidth.classic(3, refill);
         return Bucket.builder()
                 .addLimit(limit)
