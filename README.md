@@ -1,6 +1,13 @@
 # 🎯 Smart Matcher
 
-**Smart Matcher** est une application web intelligente de recrutement. Elle permet d'évaluer la compatibilité entre le profil d'un candidat (CV au format PDF) et une description d'offre d'emploi/d'alternance. Le tout est propulsé par l'intelligence artificielle **Mistral AI**.
+**Smart Matcher** est une application web intelligente de recrutement. Elle permet d'évaluer la compatibilité entre le profil d'un candidat (CV au format PDF) et une description d'offre d'emploi/d'alternance ainsi qu'une recherche d'offres d'emploi/d'alternance. Le tout est propulsé par l'intelligence artificielle **Mistral AI** et l'API **Adzuna**.
+
+## ✨ Fonctionnalités
+- **Analyse de CV** : Extraction intelligente des compétences via Mistral AI.
+- **Matching d'offres** : Comparaison automatisée de votre profil avec une offre d'emploi ciblée.
+- **Recherche d'offres intégrée** : Recherche d'emploi en direct via l'API Adzuna basée sur vos compétences.
+- **Filtres de recherche avancés** : Filtrage par localisation et par type de contrat (CDI, CDD, Alternance, etc.) avec pagination des résultats.
+- **Génération PDF** : Exportation de lettres de motivation personnalisées en format PDF.
 
 ## 🚀 Comment lancer le projet
 
@@ -21,4 +28,3 @@ Une fois que l'application a démarré dans le terminal, ouvrez votre navigateur
 👉 **http://localhost:8081/**
 
 ---
-
