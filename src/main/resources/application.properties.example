@@ -39,3 +39,7 @@ spring.servlet.multipart.max-request-size=10MB
 # --- Thymeleaf ---
 spring.thymeleaf.prefix=classpath:/templates/
 spring.thymeleaf.suffix=.html
+
+# --- Adzuna API ---
+adzuna.app.id=${ADZUNA_APP_ID:}
+adzuna.app.key=${ADZUNA_APP_KEY:}
