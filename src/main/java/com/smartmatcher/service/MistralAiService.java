@@ -20,6 +20,19 @@ public class MistralAiService {
         return chatClient.prompt().messages(new UserMessage(prompt)).call().content();
     }
 
+    public String extractProfile(String cvText) {
+        String prompt = "Tu es un expert RH. Extrais du CV suivant les 5 compétences principales de ce candidat (séparées par des virgules). Ne retourne RIEN D'AUTRE que ces 5 mots-clés.\n\n" + cvText;
+        return chatClient.prompt().messages(new UserMessage(prompt)).call().content();
+    }
+
+    public String generateCoverLetter(String cvText, String jobDescription) {
+        String prompt = "Rédige une lettre de motivation professionnelle et convaincante pour l'offre suivante, en t'appuyant sur les expériences et compétences de ce CV. \n" +
+                "N'inclue aucun commentaire ou texte avant ou après la lettre. Rédige uniquement le contenu de la lettre.\n\n" +
+                "--- OFFRE ---\n" + jobDescription + "\n\n" +
+                "--- CV ---\n" + cvText + "\n";
+        return chatClient.prompt().messages(new UserMessage(prompt)).call().content();
+    }
+
     public String buildPrompt(String cvText, String offerDescription, String delimiter) {
         return String.format(
                 "Tu es un expert en recrutement. Analyse la correspondance entre\n" +
