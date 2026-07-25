@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (usageLimitMsg) {
             usageLimitMsg.classList.remove('hidden');
-            usageLimitMsg.textContent = `Analyses restantes : ${USAGE_LIMIT - currentUsage}/${USAGE_LIMIT} (se renouvelle toutes les 15min)`;
+            usageLimitMsg.textContent = `Analyses restantes : ${USAGE_LIMIT - currentUsage}/${USAGE_LIMIT} (se renouvelle toutes les 5min)`;
             usageLimitMsg.style.color = '#6b7280';
         }
 
