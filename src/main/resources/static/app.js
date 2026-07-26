@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (usageLimitMsg) {
                 usageLimitMsg.classList.remove('hidden');
                 usageLimitMsg.textContent = `Limite atteinte. Veuillez patienter ${minutesLeft > 0 ? minutesLeft : 1} minute(s).`;
-                usageLimitMsg.style.color = '#ef4444';
+                usageLimitMsg.style.color = 'var(--danger)';
             }
             return;
         }
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (usageLimitMsg) {
             usageLimitMsg.classList.remove('hidden');
             usageLimitMsg.textContent = `Analyses restantes : ${USAGE_LIMIT - currentUsage}/${USAGE_LIMIT} (se renouvelle toutes les 5min)`;
-            usageLimitMsg.style.color = '#6b7280';
+            usageLimitMsg.style.color = 'var(--text-muted)';
         }
 
         if (selectedFile && !cvExtracted) {
@@ -94,11 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 selectedFile = file;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
-                fileNameDisplay.style.color = '#10b981';
+                fileNameDisplay.className = 'file-name success';
             } else {
                 selectedFile = null;
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
-                fileNameDisplay.style.color = '#ef4444';
+                fileNameDisplay.className = 'file-name error';
                 cvUpload.value = '';
             }
         } else {
@@ -128,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedFile = file;
                 cvUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
-                fileNameDisplay.style.color = '#10b981';
+                fileNameDisplay.className = 'file-name success';
             } else {
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
-                fileNameDisplay.style.color = '#ef4444';
+                fileNameDisplay.className = 'file-name error';
                 selectedFile = null;
             }
             checkInputs();
@@ -272,36 +272,27 @@ document.addEventListener('DOMContentLoaded', () => {
         offersList.innerHTML = '';
         offers.forEach(offer => {
             const card = document.createElement('div');
-            card.className = 'card';
-            card.style.display = 'flex';
-            card.style.flexDirection = 'column';
-            card.style.gap = '0.5rem';
+            card.className = 'offer-card';
 
             const title = document.createElement('h3');
             title.textContent = offer.title;
-            title.style.margin = '0';
             
             const company = document.createElement('p');
             company.textContent = offer.company || 'Entreprise inconnue';
-            company.style.fontWeight = 'bold';
-            company.style.color = 'var(--primary)';
+            company.className = 'offer-company';
             
             const sourceUrl = document.createElement('a');
             sourceUrl.href = offer.url;
             sourceUrl.target = '_blank';
             sourceUrl.textContent = "Voir l'annonce originale (" + offer.source + ")";
-            sourceUrl.style.fontSize = '0.9em';
-            sourceUrl.style.color = 'var(--primary)';
-            sourceUrl.style.textDecoration = 'none';
+            sourceUrl.className = 'offer-source';
             
             const desc = document.createElement('p');
             desc.textContent = (offer.description.length > 200) ? offer.description.substring(0, 200) + '...' : offer.description;
-            desc.style.color = 'var(--text-muted)';
-            desc.style.fontSize = '0.95rem';
+            desc.className = 'offer-desc';
 
             const generateBtn = document.createElement('button');
-            generateBtn.className = 'btn btn-primary';
-            generateBtn.style.marginTop = '1rem';
+            generateBtn.className = 'btn btn-primary btn-sm mt-4';
             generateBtn.style.alignSelf = 'flex-start';
             generateBtn.innerHTML = '<span class="btn-text">Générer LDM</span><span class="loader hidden"></span>';
             
@@ -456,9 +447,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayResults(data) {
         const score = data.score;
-        let strokeColor = '#ef4444';
-        if (score >= 75) strokeColor = '#10b981';
-        else if (score >= 50) strokeColor = '#f59e0b';
+        let strokeColor = 'var(--danger-text)';
+        if (score >= 75) strokeColor = 'var(--success-text)';
+        else if (score >= 50) strokeColor = '#fbbf24';
 
         scoreCircle.style.stroke = strokeColor;
         scoreCircle.style.strokeDasharray = `${score}, 100`;
