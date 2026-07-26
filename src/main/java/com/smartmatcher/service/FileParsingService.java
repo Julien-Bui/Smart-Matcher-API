@@ -16,6 +16,14 @@ public class FileParsingService
     {
         try
         {
+            // Vérification de sécurité stricte : Magic Bytes du PDF
+            try (java.io.InputStream is = file.getInputStream()) {
+                byte[] magic = new byte[4];
+                if (is.read(magic) < 4 || magic[0] != 0x25 || magic[1] != 0x50 || magic[2] != 0x44 || magic[3] != 0x46) {
+                    throw new RuntimeException("Erreur de sécurité : Le fichier uploadé n'est pas un document PDF valide (signature incorrecte).");
+                }
+            }
+
             String text = tika.parseToString(file.getInputStream());
             System.out.println("Taille du texte extrait du PDF : " + text.length() + " caractères.");
             

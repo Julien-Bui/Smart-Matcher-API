@@ -46,7 +46,7 @@ public class JobSearchExtensionController {
                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                         HttpServletRequest request) {
         try {
-            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr());
+            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr(), "search");
             if (!bucket.tryConsume(1)) {
                 return ResponseEntity.status(429)
                         .body("Erreur : Limite de requêtes atteinte. Veuillez patienter.");
@@ -73,7 +73,7 @@ public class JobSearchExtensionController {
                                                  @RequestParam("jobDescription") String jobDescription,
                                                  HttpServletRequest request) {
         try {
-            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr());
+            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr(), "generate");
             if (!bucket.tryConsume(1)) {
                 return ResponseEntity.status(429)
                         .body("Erreur : Limite de requêtes atteinte. Veuillez patienter.");
@@ -96,7 +96,7 @@ public class JobSearchExtensionController {
                                          @RequestParam(value = "companyName", defaultValue = "Entreprise") String companyName,
                                          HttpServletRequest request) {
         try {
-            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr());
+            Bucket bucket = rateLimitingService.resolveBucket(request.getRemoteAddr(), "pdf_download");
             if (!bucket.tryConsume(1)) {
                 return ResponseEntity.status(429)
                         .body("Erreur : Limite de requêtes atteinte. Veuillez patienter.");

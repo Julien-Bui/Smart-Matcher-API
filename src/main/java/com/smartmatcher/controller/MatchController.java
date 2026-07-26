@@ -38,11 +38,11 @@ public class MatchController {
         try {
             // Rate Limiting check
             String clientIp = getClientIP(request);
-            Bucket bucket = rateLimitingService.resolveBucket(clientIp);
+            Bucket bucket = rateLimitingService.resolveBucket(clientIp, "match");
 
             if (!bucket.tryConsume(1)) {
                 return ResponseEntity.status(429)
-                        .body("Erreur : Limite de 3 requêtes par 15 minutes atteinte. Veuillez patienter.");
+                        .body("Erreur : Limite de 3 requêtes par 5 minutes atteinte. Veuillez patienter.");
             }
             // Vérifier si le fichier est vide
             if (cv.isEmpty()) {
