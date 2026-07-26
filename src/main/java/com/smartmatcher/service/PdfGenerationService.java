@@ -35,8 +35,7 @@ public class PdfGenerationService {
             return outputStream.toByteArray();
 
         } catch (DocumentException e) {
-            System.err.println("Error generating PDF: " + e.getMessage());
-            return new byte[0];
+            throw new RuntimeException("Erreur de génération du PDF : " + e.getMessage(), e);
         }
     }
 }

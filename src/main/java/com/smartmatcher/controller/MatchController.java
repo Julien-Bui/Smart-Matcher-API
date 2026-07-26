@@ -68,7 +68,8 @@ public class MatchController {
             MatchResult result = matchingEngine.processMatching(cv, description);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erreur : " + e.getMessage());
+            System.err.println("[MatchController] Erreur interne : " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Erreur : Une erreur interne est survenue lors de l'analyse.");
         }
     }
 
