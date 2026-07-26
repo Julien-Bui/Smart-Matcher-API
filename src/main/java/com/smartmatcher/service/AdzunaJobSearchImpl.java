@@ -37,17 +37,21 @@ public class AdzunaJobSearchImpl implements JobSearchProvider {
 
         try {
             String[] allKeywords = keywords != null ? keywords.split(",") : new String[]{"developer"};
+            String contractSuffix = (contractType != null && !contractType.trim().isEmpty() && !contractType.equalsIgnoreCase("Tous")) 
+                                    ? " " + contractType.trim() : "";
             
             for (String keyword : allKeywords) {
                 String searchTerm = keyword.trim();
                 if (searchTerm.isEmpty()) continue;
+                
+                searchTerm += contractSuffix;
                 
                 offers = queryAdzuna(searchTerm, location, page);
                 if (!offers.isEmpty()) break;
             }
             
             if (offers.isEmpty()) {
-                offers = queryAdzuna("développeur", location, page);
+                offers = queryAdzuna("développeur" + contractSuffix, location, page);
             }
             
         } catch (Exception e) {
