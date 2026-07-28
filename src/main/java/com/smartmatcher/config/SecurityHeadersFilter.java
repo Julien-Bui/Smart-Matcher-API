@@ -23,9 +23,15 @@ public class SecurityHeadersFilter implements Filter {
             httpResponse.setHeader("X-Content-Type-Options", "nosniff");
             httpResponse.setHeader("X-Frame-Options", "DENY");
             httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
+            httpResponse.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
 
-            httpResponse.setHeader("Content-Security-Policy",
-                    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';");
+            String csp = "default-src 'self'; " +
+                         "connect-src 'self' https://api.adzuna.com https://smart-matcher-api-production.up.railway.app; " +
+                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                         "font-src 'self' https://fonts.gstatic.com; " +
+                         "script-src 'self' 'unsafe-inline'; " +
+                         "img-src 'self' data:;";
+            httpResponse.setHeader("Content-Security-Policy", csp);
         }
 
         chain.doFilter(request, response);
