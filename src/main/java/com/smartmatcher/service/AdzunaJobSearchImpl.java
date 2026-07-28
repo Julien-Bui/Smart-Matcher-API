@@ -46,8 +46,10 @@ public class AdzunaJobSearchImpl implements JobSearchProvider {
                 
                 searchTerm += contractSuffix;
                 
-                offers = queryAdzuna(searchTerm, location, page);
-                if (!offers.isEmpty()) break;
+                List<JobOffer> keywordOffers = queryAdzuna(searchTerm, location, page);
+                offers.addAll(keywordOffers);
+                
+                if (offers.size() >= 10) break;
             }
             
             if (offers.isEmpty()) {

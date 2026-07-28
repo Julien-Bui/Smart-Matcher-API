@@ -8,5 +8,7 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface OfferRepo extends JpaRepository<Offer, Long> {
-    void deleteByCreatedAtBefore(LocalDateTime expiryDate);
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM Offer o WHERE o.createdAt < :expiryDate")
+    void deleteByCreatedAtBefore(@org.springframework.data.repository.query.Param("expiryDate") LocalDateTime expiryDate);
 }

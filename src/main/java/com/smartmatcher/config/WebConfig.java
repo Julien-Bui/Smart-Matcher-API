@@ -31,4 +31,37 @@ public class WebConfig {
         
         return new CorsFilter(source);
     }
+
+    @Bean
+    public org.springframework.web.filter.OncePerRequestFilter securityHeadersFilter() {
+        return new org.springframework.web.filter.OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
+                                            jakarta.servlet.http.HttpServletResponse response,
+                                            jakarta.servlet.FilterChain filterChain)
+                    throws jakarta.servlet.ServletException, java.io.IOException {
+                
+                // Anti-Clickjacking
+                response.setHeader("X-Frame-Options", "DENY");
+                
+                // Anti-MIME Sniffing
+                response.setHeader("X-Content-Type-Options", "nosniff");
+                
+                // Force HTTPS (HSTS) - 1 year
+                response.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                
+                // Content Security Policy
+                // Autorise le chargement depuis le même domaine, et Google Fonts
+                String csp = "default-src 'self'; " +
+                             "connect-src 'self' https://api.adzuna.com https://smart-matcher-api-production.up.railway.app; " +
+                             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                             "font-src 'self' https://fonts.gstatic.com; " +
+                             "script-src 'self' 'unsafe-inline'; " +
+                             "img-src 'self' data:;";
+                response.setHeader("Content-Security-Policy", csp);
+
+                filterChain.doFilter(request, response);
+            }
+        };
+    }
 }

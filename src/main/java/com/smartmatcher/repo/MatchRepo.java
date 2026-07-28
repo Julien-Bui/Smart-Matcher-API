@@ -14,5 +14,7 @@ public interface MatchRepo extends JpaRepository<MatchResult, Long>
 
     List<MatchResult> findByScoreGreaterThanEqual(int minScore);
 
-    void deleteByCreatedAtBefore(java.time.LocalDateTime expiryDate);
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM MatchResult m WHERE m.createdAt < :expiryDate")
+    void deleteByCreatedAtBefore(@org.springframework.data.repository.query.Param("expiryDate") java.time.LocalDateTime expiryDate);
 }
