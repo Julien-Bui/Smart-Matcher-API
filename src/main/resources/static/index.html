@@ -21,19 +21,26 @@
             <h2>Profil du candidat</h2>
             <div class="cv-section">
                 <div class="upload-area" id="drop-zone">
-                    <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
-                    <p class="upload-title">Glissez votre CV (PDF) ici</p>
-                    <span class="or-text">ou</span>
-                    <label for="cv-upload" class="btn btn-secondary">Parcourir</label>
+                    <p class="upload-title desktop-only">Glissez votre CV (PDF) ici</p>
+                    <span class="or-text desktop-only">ou</span>
+                    <label for="cv-upload" class="btn btn-secondary upload-btn">
+                        <span class="desktop-text">Parcourir</span>
+                        <span class="mobile-text">Téléchargez votre CV</span>
+                    </label>
                     <input type="file" id="cv-upload" accept=".pdf" hidden>
                     <p id="file-name" class="file-name hidden"></p>
+                    
+                    <div id="extraction-loader" class="hidden mt-4 text-center">
+                        <span class="loader" style="width: 24px; height: 24px; border-color: var(--action-primary-bg); border-top-color: transparent;"></span>
+                        <p class="text-sm mt-2" style="color: var(--action-primary-bg); font-weight: 500;">Extraction des données du CV en cours...</p>
+                    </div>
                 </div>
-                <button id="extract-cv-btn" class="btn btn-primary full-width mt-6 hidden">
-                    <span class="btn-text">Valider le profil</span>
-                    <span class="loader hidden"></span>
-                </button>
             </div>
         </section>
 
@@ -41,7 +48,9 @@
             <div class="panel">
                 <h2>J'ai déjà une offre</h2>
                 <div class="form-group">
-                    <textarea id="job-description" class="form-input" placeholder="Collez le descriptif complet du poste ici..." rows="12"></textarea>
+                    <textarea id="job-description" class="form-input"
+                        placeholder="Ex: Copiez ici l'intitulé du poste, la mission et les compétences requises..."
+                        rows="12"></textarea>
                 </div>
                 <button id="analyze-btn" class="btn btn-primary full-width mt-4" disabled>
                     <span class="btn-text">Analyser la compatibilité</span>
@@ -51,19 +60,33 @@
 
             <div class="panel">
                 <h2>Chercher pour moi</h2>
-                <p class="text-muted text-sm mb-6">Laissez l'IA trouver les meilleures offres correspondant à votre profil sur Adzuna.</p>
-                
+                <p class="text-muted text-sm mb-6">Laissez l'IA trouver les meilleures offres correspondant à votre
+                    profil sur Adzuna.</p>
+
                 <div class="form-group">
+                    <label for="job-keywords">Mots-clés / Titre du poste</label>
+                    <div class="input-with-icon">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" id="job-keywords" class="form-input"
+                            placeholder="Ex: Développeur React, Chef de projet...">
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
                     <label for="job-location">Localisation</label>
                     <div class="input-with-icon">
                         <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z"/>
-                            <circle cx="12" cy="10" r="3"/>
+                            <path
+                                d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 5.02944 7.02944 1 12 1C16.9706 1 21 5.02944 21 10Z" />
+                            <circle cx="12" cy="10" r="3" />
                         </svg>
                         <input type="text" id="job-location" class="form-input" placeholder="Ex: Paris, Remote...">
                     </div>
                 </div>
-                
+
                 <div class="form-group mt-4">
                     <label for="contract-type">Type de contrat</label>
                     <div class="select-wrapper">
@@ -100,7 +123,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div id="offers-list" class="offers-grid">
                 <!-- Offres injectées ici -->
             </div>
@@ -133,29 +156,33 @@
                     <ul id="cons-list"></ul>
                 </div>
             </div>
-            
+
             <div class="summary-box">
                 <h4>Synthèse</h4>
                 <p class="summary-text" id="summary-text"></p>
             </div>
-            
+
             <div class="mt-8 text-center">
                 <button id="reset-btn" class="btn btn-secondary">Nouvelle analyse</button>
             </div>
         </div>
-        
+
         <div id="cover-letter-modal" class="modal-backdrop hidden">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Lettre de Motivation</h2>
                     <button class="icon-btn" id="close-modal-icon-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
                     </button>
                 </div>
                 <p class="text-muted text-sm mb-4">Revue avant génération PDF.</p>
-                
+
                 <textarea id="cover-letter-text" class="form-input" rows="16"></textarea>
-                
+
                 <div class="modal-actions">
                     <button id="close-modal-btn" class="btn btn-outline">Annuler</button>
                     <button id="download-pdf-btn" class="btn btn-primary">
@@ -165,7 +192,62 @@
                 </div>
             </div>
         </div>
+        <div id="legal-modal" class="modal-backdrop hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Mentions Légales & CGU</h2>
+                    <button class="icon-btn" id="close-legal-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="legal-text text-left">
+                    <h3>1. Éditeur du site</h3>
+                    <p>Smart Matcher est édité par Julien Bui, Étudiant à l'EPITA en France<br>
+                    </p>
+
+                    <h3>2. Hébergement</h3>
+                    <p>Le site est hébergé par Railway Corporation, 500 16th St, San Francisco, CA 94103, États-Unis.
+                    </p>
+
+                    <h3>3. Traitement des Données (RGPD)</h3>
+                    <p>Aucun fichier PDF n'est sauvegardé sur nos serveurs. Votre CV est traité de manière éphémère
+                        uniquement pour l'extraction de texte. Les résultats de l'analyse (offres et profil) sont
+                        stockés temporairement dans notre base de données et automatiquement supprimés après 24 heures.
+                    </p>
+                    <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit
+                        d'accès, de rectification et de suppression de vos données.</p>
+
+                    <h3>4. Limites d'Utilisation</h3>
+                    <p>L'utilisation est limitée à 3 analyses/recherches par tranche de 5 minutes par utilisateur. En
+                        cas de dépassement, le service sera temporairement suspendu pour votre adresse IP.</p>
+
+                    <h3>5. Exactitude des résultats (IA)</h3>
+                    <p>Bien que nous utilisions les dernières technologies (Mistral AI), nous ne garantissons ni
+                        l'exactitude, ni la pertinence des résultats et des lettres de motivation générées.
+                        L'utilisateur reste seul responsable de la vérification et de l'envoi des documents finaux.</p>
+
+                    <h3>6. Disponibilité du Service</h3>
+                    <p>L'éditeur se réserve le droit de suspendre, modifier ou restreindre l'accès au service à tout
+                        moment, notamment en cas de forte affluence (limitation du trafic) ou de maintenance technique.
+                    </p>
+
+                    <h3>7. Propriété Intellectuelle</h3>
+                    <p>L'ensemble des éléments de ce site (design, code, textes) est la propriété exclusive de Julien
+                        Bui. Toute reproduction, représentation ou diffusion, totale ou partielle, sans autorisation
+                        écrite préalable est interdite.</p>
+                </div>
+            </div>
+        </div>
+        <footer class="site-footer text-center">
+            <button id="open-legal-btn" class="btn-link">Mentions Légales & Conditions d'Utilisation</button>
+            <p class="text-sm text-muted mt-2">© 2024 Smart Matcher. Propulsé par Mistral AI & Adzuna.</p>
+        </footer>
     </main>
     <script src="app.js?v=4"></script>
 </body>
+
 </html>

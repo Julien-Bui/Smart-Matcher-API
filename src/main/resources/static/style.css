@@ -159,8 +159,11 @@ header {
 
 .upload-area:hover, .upload-area.dragover {
     border-color: var(--action-primary-bg);
+    border-style: solid;
     background: #eff6ff; /* Blue 50 */
 }
+
+.mobile-text { display: none; }
 
 .upload-icon {
     color: var(--action-primary-bg);
@@ -607,4 +610,55 @@ textarea.form-input {
     .panel {
         padding: 1.5rem;
     }
+    .desktop-only, .desktop-text {
+        display: none !important;
+    }
+    .mobile-text {
+        display: inline !important;
+    }
+    .upload-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+}
+
+/* Footer & Legal */
+.site-footer {
+    padding: 2rem 0;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-family: inherit;
+}
+.btn-link:hover {
+    color: var(--text-primary);
+}
+.legal-text {
+    line-height: 1.6;
+    color: var(--text-secondary);
+    text-align: left;
+}
+.legal-text h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+.legal-text p, .legal-text ul {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+.legal-text ul {
+    padding-left: 1.5rem;
 }

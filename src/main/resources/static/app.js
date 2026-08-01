@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadPdfBtn = document.getElementById('download-pdf-btn');
 
     const jobLocationInput = document.getElementById('job-location');
+    const jobKeywordsInput = document.getElementById('job-keywords');
     const contractTypeSelect = document.getElementById('contract-type');
 
     let selectedFile = null;
@@ -72,12 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
             usageLimitMsg.style.color = 'var(--text-muted)';
         }
 
-        if (selectedFile && !cvExtracted) {
-            extractCvBtn.classList.remove('hidden');
-        } else {
-            extractCvBtn.classList.add('hidden');
-        }
-
         if (cvExtracted) {
             searchApplyBtn.disabled = false;
             if (jobDescription.value.trim() !== '') {
@@ -88,6 +83,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function handleFileSelection() {
+        const extractionLoader = document.getElementById('extraction-loader');
+        
+        // Cacher les autres éléments pour mettre en avant le chargement
+        document.querySelector('.upload-title.desktop-only').classList.add('hidden');
+        document.querySelector('.or-text.desktop-only').classList.add('hidden');
+        document.querySelector('.upload-btn').classList.add('hidden');
+        
+        extractionLoader.classList.remove('hidden');
+        
+        setTimeout(() => {
+            extractionLoader.classList.add('hidden');
+            
+            // Remettre les classes pour le prochain reset
+            document.querySelector('.upload-title.desktop-only').classList.remove('hidden');
+            document.querySelector('.or-text.desktop-only').classList.remove('hidden');
+            document.querySelector('.upload-btn').classList.remove('hidden');
+            
+            cvExtracted = true;
+            step1Section.classList.add('hidden');
+            step2Section.classList.remove('hidden');
+            checkInputs();
+        }, 1200);
+    }
+
     cvUpload.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -95,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedFile = file;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
                 fileNameDisplay.className = 'file-name success';
+                handleFileSelection();
             } else {
                 selectedFile = null;
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
@@ -129,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cvUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
                 fileNameDisplay.className = 'file-name success';
+                handleFileSelection();
             } else {
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
                 fileNameDisplay.className = 'file-name error';
@@ -139,25 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     jobDescription.addEventListener('input', checkInputs);
-
-    extractCvBtn.addEventListener('click', () => {
-        const btnText = extractCvBtn.querySelector('.btn-text');
-        const loader = extractCvBtn.querySelector('.loader');
-        
-        btnText.classList.add('hidden');
-        loader.classList.remove('hidden');
-        
-        // Simuler un petit délai
-        setTimeout(() => {
-            btnText.classList.remove('hidden');
-            loader.classList.add('hidden');
-            
-            cvExtracted = true;
-            step1Section.classList.add('hidden');
-            step2Section.classList.remove('hidden');
-            checkInputs();
-        }, 800);
-    });
 
     function incrementUsage() {
         if (currentUsage === 0) {
@@ -229,9 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('cv', selectedFile);
         
+        const keywordsVal = jobKeywordsInput ? jobKeywordsInput.value.trim() : '';
         const locationVal = jobLocationInput ? jobLocationInput.value.trim() : '';
         const contractVal = contractTypeSelect ? contractTypeSelect.value : 'Tous';
         
+        if (keywordsVal !== '') {
+            formData.append('keywords', keywordsVal);
+        }
         if (locationVal !== '') {
             formData.append('location', locationVal);
         }
@@ -294,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const generateBtn = document.createElement('button');
             generateBtn.className = 'btn btn-primary btn-sm mt-4';
             generateBtn.style.alignSelf = 'flex-start';
-            generateBtn.innerHTML = '<span class="btn-text">Générer LDM</span><span class="loader hidden"></span>';
+            generateBtn.innerHTML = '<span class="btn-text">Générer Lettre de Motivation</span><span class="loader hidden"></span>';
             
             generateBtn.addEventListener('click', () => generateCoverLetter(offer, generateBtn));
 
@@ -415,8 +422,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData();
         formData.append('cv', selectedFile);
+        const keywordsVal = jobKeywordsInput ? jobKeywordsInput.value.trim() : '';
         const locationVal = jobLocationInput ? jobLocationInput.value.trim() : '';
         const contractVal = contractTypeSelect ? contractTypeSelect.value : 'Tous';
+        if (keywordsVal !== '') formData.append('keywords', keywordsVal);
         if (locationVal !== '') formData.append('location', locationVal);
         if (contractVal !== 'Tous') formData.append('contractType', contractVal);
         formData.append('page', currentPage);
@@ -498,6 +507,19 @@ document.addEventListener('DOMContentLoaded', () => {
         checkInputs();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    const legalModal = document.getElementById('legal-modal');
+    const openLegalBtn = document.getElementById('open-legal-btn');
+    const closeLegalBtn = document.getElementById('close-legal-btn');
+
+    if (openLegalBtn && legalModal && closeLegalBtn) {
+        openLegalBtn.addEventListener('click', () => {
+            legalModal.classList.remove('hidden');
+        });
+        closeLegalBtn.addEventListener('click', () => {
+            legalModal.classList.add('hidden');
+        });
+    }
 
     checkInputs();
 });
