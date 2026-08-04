@@ -34,13 +34,146 @@ document.addEventListener('DOMContentLoaded', () => {
     const jobLocationInput = document.getElementById('job-location');
     const jobKeywordsInput = document.getElementById('job-keywords');
     const contractTypeSelect = document.getElementById('contract-type');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
 
     let selectedFile = null;
     let cvExtracted = false;
     let currentCompanyName = "Entreprise";
     let currentPage = 1;
     
-    // Limite remise en place pour la production
+    // -- IndexedDB Setup pour l'historique --
+    const DB_NAME = 'SmartMatcherDB';
+    const STORE_NAME = 'cv_history';
+    const EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 24h
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onerror = (e) => reject('IndexedDB error');
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                }
+            };
+        });
+    }
+
+    async function saveCV(file) {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const cvData = { id: file.name, file: file, timestamp: Date.now() };
+            store.put(cvData);
+            return new Promise((resolve, reject) => {
+                tx.oncomplete = () => { loadHistory(); resolve(); };
+                tx.onerror = () => reject(tx.error);
+            });
+        } catch (e) {
+            console.error('Error saving CV to DB', e);
+        }
+    }
+
+    async function loadHistory() {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.getAll();
+            request.onsuccess = () => {
+                const now = Date.now();
+                const cvHistoryContainer = document.getElementById('cv-history-container');
+                const cvHistoryList = document.getElementById('cv-history-list');
+                
+                let activeFiles = request.result.filter(item => {
+                    if (now - item.timestamp > EXPIRATION_TIME) {
+                        store.delete(item.id);
+                        return false;
+                    }
+                    return true;
+                });
+                activeFiles.sort((a, b) => b.timestamp - a.timestamp);
+                
+                window.activeFilesMap = {};
+                cvHistoryList.innerHTML = '';
+                if (activeFiles.length > 0) {
+                    cvHistoryContainer.classList.remove('hidden');
+                    activeFiles.forEach(item => {
+                        window.activeFilesMap[item.id] = item.file;
+                        const div = document.createElement('div');
+                        div.className = 'history-item';
+                        div.draggable = true;
+                        div.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', item.id);
+                            e.dataTransfer.effectAllowed = 'copyMove';
+                        });
+                        
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'history-item-name';
+                        nameSpan.textContent = item.id;
+                        nameSpan.title = item.id;
+                        nameSpan.onclick = () => selectFromHistory(item.file);
+                        
+                        const delBtn = document.createElement('span');
+                        delBtn.className = 'history-item-delete';
+                        delBtn.innerHTML = '&times;';
+                        delBtn.onclick = (e) => { e.stopPropagation(); deleteCV(item.id); };
+                        
+                        div.appendChild(nameSpan);
+                        div.appendChild(delBtn);
+                        cvHistoryList.appendChild(div);
+                    });
+                } else {
+                    cvHistoryList.innerHTML = '<p class="text-sm text-muted w-100 mt-2">Aucun CV récent pour le moment. Chargez un CV pour l\'ajouter à l\'historique.</p>';
+                }
+                // S'assurer que le container est toujours visible (côte à côte)
+                if (cvHistoryContainer.classList.contains('hidden')) {
+                    cvHistoryContainer.classList.remove('hidden');
+                }
+            };
+        } catch (e) {
+            console.error('Error loading history', e);
+        }
+    }
+
+    async function deleteCV(id) {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).delete(id);
+            tx.oncomplete = () => loadHistory();
+        } catch (e) {
+            console.error('Error deleting CV', e);
+        }
+    }
+
+    async function clearHistory() {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).clear();
+            tx.oncomplete = () => loadHistory();
+        } catch (e) {
+            console.error('Error clearing history', e);
+        }
+    }
+
+    function selectFromHistory(file) {
+        selectedFile = file;
+        fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
+        fileNameDisplay.className = 'file-name success';
+        handleFileSelection();
+    }
+    
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', clearHistory);
+    }
+    
+    // Load history at startup
+    loadHistory();
+    // -- Fin Setup IndexedDB --
     const USAGE_LIMIT = 3;
     const TIME_LIMIT_MS = 5 * 60 * 1000;
 
@@ -115,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedFile = file;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
                 fileNameDisplay.className = 'file-name success';
+                saveCV(file);
                 handleFileSelection();
             } else {
                 selectedFile = null;
@@ -143,13 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
 
-        if (e.dataTransfer.files.length > 0) {
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0];
             if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
                 selectedFile = file;
                 cvUpload.files = e.dataTransfer.files;
                 fileNameDisplay.textContent = `📝 ${selectedFile.name}`;
                 fileNameDisplay.className = 'file-name success';
+                saveCV(file);
                 handleFileSelection();
             } else {
                 fileNameDisplay.textContent = '❌ Fichier PDF uniquement';
@@ -157,6 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedFile = null;
             }
             checkInputs();
+        } else {
+            const draggedCvId = e.dataTransfer.getData('text/plain');
+            if (draggedCvId && window.activeFilesMap && window.activeFilesMap[draggedCvId]) {
+                selectFromHistory(window.activeFilesMap[draggedCvId]);
+            }
         }
     });
 
