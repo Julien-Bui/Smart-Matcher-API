@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cvExtracted = false;
     let currentCompanyName = "Entreprise";
     let currentPage = 1;
+    let currentExtractedSkills = null;
     
     // -- IndexedDB Setup pour l'historique --
     const DB_NAME = 'SmartMatcherDB';
@@ -370,7 +371,11 @@ document.addEventListener('DOMContentLoaded', () => {
         saLoader.classList.remove('hidden');
 
         const formData = new FormData();
-        formData.append('cv', selectedFile);
+        if (currentExtractedSkills) {
+            formData.append('skills', currentExtractedSkills);
+        } else {
+            formData.append('cv', selectedFile);
+        }
         
         const keywordsVal = jobKeywordsInput ? jobKeywordsInput.value.trim() : '';
         const locationVal = jobLocationInput ? jobLocationInput.value.trim() : '';
@@ -399,8 +404,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorText || response.statusText);
             }
 
-            const offers = await response.json();
-            displayOffers(offers);
+            const data = await response.json();
+            if (data.skills) currentExtractedSkills = data.skills;
+            displayOffers(data.offers);
             
             step2Section.classList.add('hidden');
             offersContainer.classList.remove('hidden');
@@ -561,7 +567,11 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshOffersBtn.disabled = true;
 
         const formData = new FormData();
-        formData.append('cv', selectedFile);
+        if (currentExtractedSkills) {
+            formData.append('skills', currentExtractedSkills);
+        } else {
+            formData.append('cv', selectedFile);
+        }
         const keywordsVal = jobKeywordsInput ? jobKeywordsInput.value.trim() : '';
         const locationVal = jobLocationInput ? jobLocationInput.value.trim() : '';
         const contractVal = contractTypeSelect ? contractTypeSelect.value : 'Tous';
@@ -581,8 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const errorText = await response.text();
                 throw new Error(errorText || response.statusText);
             }
-            const offers = await response.json();
-            displayOffers(offers);
+            const data = await response.json();
+            if (data.skills) currentExtractedSkills = data.skills;
+            displayOffers(data.offers);
             offersList.scrollIntoView({ behavior: 'smooth' });
         } catch (error) {
             alert("Plus d'offres disponibles pour cette recherche.");
@@ -637,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', () => {
         selectedFile = null;
         cvExtracted = false;
+        currentExtractedSkills = null;
         cvUpload.value = '';
         fileNameDisplay.textContent = '';
         jobDescription.value = '';

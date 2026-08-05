@@ -40,7 +40,8 @@ public class JobSearchExtensionController {
     }
 
     @PostMapping("/search-jobs")
-    public ResponseEntity<?> searchJobs(@RequestParam("cv") MultipartFile cv,
+    public ResponseEntity<?> searchJobs(@RequestParam(value = "cv", required = false) MultipartFile cv,
+                                        @RequestParam(value = "skills", required = false) String providedSkills,
                                         @RequestParam(value = "location", required = false) String location,
                                         @RequestParam(value = "contractType", required = false) String contractType,
                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -51,17 +52,22 @@ public class JobSearchExtensionController {
                 return ResponseEntity.status(429)
                         .body("Erreur : Limite de requêtes atteinte. Veuillez patienter.");
             }
-            if (cv.isEmpty()) {
-                return ResponseEntity.badRequest().body("Erreur : Le fichier CV est vide.");
+            if ((cv == null || cv.isEmpty()) && (providedSkills == null || providedSkills.trim().isEmpty())) {
+                return ResponseEntity.badRequest().body("Erreur : Le fichier CV ou les compétences sont manquants.");
             }
-            String cvText = fileParsingService.extractText(cv);
-            String skills = mistralAiService.extractProfile(cvText);
+            
+            String skills = providedSkills;
+            if (skills == null || skills.trim().isEmpty()) {
+                String cvText = fileParsingService.extractText(cv);
+                skills = mistralAiService.extractProfile(cvText);
+            }
+            
             List<JobOffer> offers = aggregatorJobSearchService.searchAll(skills, location, contractType, page);
             
             if (offers.isEmpty()) {
                 return ResponseEntity.badRequest().body("Aucune offre trouvée pour les compétences : " + skills);
             }
-            return ResponseEntity.ok(offers);
+            return ResponseEntity.ok(Map.of("skills", skills, "offers", offers));
         } catch (Exception e) {
             System.err.println("[search-jobs] Erreur interne: " + e.getMessage());
             return ResponseEntity.internalServerError().body("Erreur : Une erreur interne est survenue.");
